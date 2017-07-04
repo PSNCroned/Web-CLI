@@ -3,7 +3,7 @@
 	height: 50px;
 	position: fixed;
 	bottom: 0px;
-	z-index: 1000;
+	z-index: 999999999999;
 	text-align: center;
 }
 
@@ -16,10 +16,15 @@
 	opacity: .7;
 }
 
-#wcliConsole {
+#wcliWrapper {
 	position: relative;
-	left: 25%;
-	bottom: 50px;
+	bottom: 35px;
+	width: 100%;
+	text-align: center;
+}
+
+#wcliConsole {
+	display: inline-block;
 	width: 50%;
 	height: 20px;
 	padding: 0px;
@@ -32,9 +37,8 @@
 }
 
 #wcliConsoleLabel {
-	position: relative;
-	left: 23.75%;
-	bottom: 32px;
+	display: inline-block;
+	margin-right: 5px;
 	color: white;
 	font-family: Arial;
 	font-size: 15px;

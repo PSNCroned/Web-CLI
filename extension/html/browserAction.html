@@ -1,9 +1,79 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		
+		<style>
+			@charset "UTF-8";
+			
+			#container {
+				width: 400px;
+				height: 300px;
+			}
+			
+			#navbar {
+				width: 100%;
+				text-align: center;
+			}
+			
+			#navbar span {
+				display: inline-block;
+				width: 50px;
+				margin: 10px;
+				background-color: #ededed;
+				cursor: pointer;
+			}
+			
+			.sel {
+				background-color: #d8d8d8 !important;
+			}
+			
+			#macroTab {
+				
+			}
+			
+			#scriptTab {
+				
+			}
+			
+			.panel {
+				width: 100%;
+				text-align: center;
+			}
+			
+			#macroPanel {
+				
+			}
+			
+			#scriptPanel {
+				display: none;
+			}
+			
+			.cmdName {
+				margin-top: 20px;
+				width: 20px;
+			}
+			
+			#macroInput {
+				margin-top: 30px;
+			}
+		</style>
 	</head>
 	<body>
-		hi
+		<div id="container">
+			<div id="navbar">
+				<span id="macroTab" class="sel">Macros</span>
+				<span id="scriptTab">Scripts</span>
+			</div>
+			<div id="macroPanel" class="panel">
+				Command Name: <input class="cmdName" /><br />
+				<input id="macroInput" disabled />
+			</div>
+			<div id="scriptPanel" class="panel">
+				Command Name: <input class="cmdName" />
+				<textarea disabled></textarea>
+			</div>
+		</div>
+		<script>
+			
+		</script>
 	</body>
 </html>
