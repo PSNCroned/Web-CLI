@@ -52,28 +52,34 @@
 				width: 20px;
 			}
 			
-			#macroInput {
+			#macroInput, #scriptInput {
 				margin-top: 30px;
+				margin-bottom: 10px;
 			}
 		</style>
+		<script src="../libs/jquery-3.1.1.min.js"></script>
 	</head>
 	<body>
 		<div id="container">
 			<div id="navbar">
-				<span id="macroTab" class="sel">Macros</span>
-				<span id="scriptTab">Scripts</span>
+				<span id="macroTab" class="sel" data-panel="macro">Macros</span>
+				<span id="scriptTab" data-panel="script">Scripts</span>
 			</div>
 			<div id="macroPanel" class="panel">
-				Command Name: <input class="cmdName" /><br />
-				<input id="macroInput" disabled />
+				Command Name: <input id="macro" class="cmdName" />
+				<button class="nameB" data-type="macro" data-action="edit">Edit</button><br />
+				<input id="macroInput" disabled /><br />
+				<button class="contentB" data-type="macro" data-action="save" disabled>Save</button>
+				<button class="contentB" data-type="macro" data-action="cancel" disabled>Cancel</button>
 			</div>
 			<div id="scriptPanel" class="panel">
-				Command Name: <input class="cmdName" />
-				<textarea disabled></textarea>
+				Command Name: <input id="script" class="cmdName" />
+				<button class="nameB" data-type="script" data-action="edit">Edit</button><br />
+				<textarea id="scriptInput" disabled></textarea><br />
+				<button class="contentB" data-type="script" data-action="save" disabled>Save</button>
+				<button class="contentB" data-type="script" data-action="cancel" disabled>Cancel</button>
 			</div>
 		</div>
-		<script>
-			
-		</script>
+		<script src="../browserAction.js"></script>
 	</body>
 </html>

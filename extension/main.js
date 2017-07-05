@@ -141,13 +141,27 @@ var process = function (cmd) {
 				case "close":
 					chrome.runtime.sendMessage({type: "close"});
 					break;
+				case "macro":
+					if (args[1] in settings.custom.macros) process(settings.custom.macros[args[1]]);
+					break;
+				case "script":
+					if (args[1] in settings.custom.scripts) eval(settings.custom.scripts[args[1]]);
+					checkCombos();
+					break;
 				case "help":
 					//
 					break;
 				default:
-					if (settings.custom.commands[args[0]]) {
+					if (args[0] in settings.custom.commands) {
 						args[0] = settings.custom.commands[args[0]];
 						process(args.join(" "));
+					}
+					else if (args[0] in settings.custom.macros) {
+						process(settings.custom.macros[args[0]]);
+					}
+					else if (args[0] in settings.custom.scripts) {
+						eval(settings.custom.scripts[args[0]]);
+						checkCombos();
 					}
 					else {
 						sAlert(`${args[0]} is not a known command!`);
@@ -242,6 +256,23 @@ var changeOpen = function (bool) {
 			bottom: "-50px"
 		}, 150);
 	}
+};
+
+var store = function (key="default", data="") {
+	chrome.runtime.sendMessage({type: "store", key: key, data: data});
+};
+
+var retrieve = function (key, cb) {
+	if (typeof key == "string") {
+		chrome.runtime.sendMessage({type: "retrieve", key: key}, cb);
+	}
+	else if (typeof key == "function") {
+		chrome.runtime.sendMessage({type: "retrieve", key: null}, key);
+	}
+};
+
+var deleteKey = function (key) {
+	chrome.runtime.sendMessage({type: "deleteKey", key: key});
 };
 
 var pageLoad = function () {

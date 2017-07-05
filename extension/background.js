@@ -1,10 +1,13 @@
 var settings = {};
 var combo = "";
+var storage = {};
 
 var template = {
 	open: true,
 	custom: {
-		commands: {}
+		commands: {},
+		macros: {},
+		scripts: {}
 	},
 	go: {
 		google: "https://google.com",
@@ -109,6 +112,8 @@ chrome.runtime.onMessage.addListener(function (res, sender, sRes) {
 				settings = res.settings;	
 			}
 			
+			console.log(settings);
+			
 			save();
 			updateTabs();
 			break;
@@ -119,8 +124,31 @@ chrome.runtime.onMessage.addListener(function (res, sender, sRes) {
 			sRes({type: "combo", combo: combo});
 			break;
 		case "addCombo":
-			combo = res.combo + ";" + combo;
+			if (combo) {
+				if (res.combo[res.combo.length - 1] != ";") {
+					combo = res.combo + ";" + combo;
+				}
+				else {
+					combo = res.combo + combo;
+				}
+			}
+			else {
+				combo = res.combo;
+			}
 			break;
+		case "store":
+			storage[res.key] = res.data;
+			break;
+		case "retrieve":
+			if (res.key) {
+				sRes({data: storage[res.key]});
+			}
+			else {
+				sRes({data: storage});
+			}
+			break;
+		case "deleteKey":
+			delete storage[res.key];
 		case "reset":
 			settings = template;
 			save();
