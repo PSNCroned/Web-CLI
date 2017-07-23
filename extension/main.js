@@ -2,12 +2,16 @@ console.log("Web CLI running");
 
 var settings;
 var localStorage = window.localStorage;
+var historyIndex = -1;
+var tempHistVal = "";
+var lastAlert = null;
 
 const consoleContainer = document.createElement("div");
 const panel = document.createElement("div");
 const formWrapper = document.createElement("div");
 const label = document.createElement("div");
 const input = document.createElement("input");
+const notif = document.createElement("div");
 
 consoleContainer.id = "wcliConsoleContainer";
 
@@ -24,177 +28,280 @@ input.spellcheck = false;
 label.id = "wcliConsoleLabel";
 label.textContent = ">";
 
+notif.id = "wcliNotif";
+
 consoleContainer.appendChild(panel);
 consoleContainer.appendChild(formWrapper);
 formWrapper.appendChild(label);
 formWrapper.appendChild(input);
+formWrapper.appendChild(notif);
 
 var process = function (cmd) {
 	cmd = cmd.trim();
-	if (cmd[cmd.length - 1] == ";") {
-		cmd.replace(";", "");
-	}
-	
-	var combo = cmd.toLowerCase().split(";");
-	if (combo.length == 1) {
-		let args = cmd.toLowerCase().split(" ");
-		let caseArgs = cmd.split(" ");
-		let flairs = [];
-		let notFlairs = [];
-		
-		for (let i in args) {
-			if (args[i].indexOf("-") == 0) {
-				flairs.push(args[i]);
+	if (cmd.length) {
+		if (cmd[cmd.length - 1] == ";") {
+			cmd.replace(";", "");
+		}
+
+		var chain = cmd.toLowerCase().split(";");
+		if (chain.length == 1) {
+			let args = cmd.toLowerCase().split(" ");
+			let caseArgs = cmd.split(" ");
+			let flairs = [];
+			let notFlairs = [];
+			var repeat = 0;
+
+			for (let i in args) {
+				if (args[i].indexOf("-") == 0) {
+					flairs.push(args[i]);
+				}
+				else if (args[i].indexOf("*") == 0 && args[i].indexOf("}") != 1) {
+					let num = args[i].slice(1);
+					if (parseInt(num)) {
+						repeat = num;
+					}
+				}
+				else {
+					notFlairs.push(args[i]);
+				}
+			}
+
+			if (repeat > 0) {
+				let cleaned = cmd.substr(0, cmd.indexOf("*")).trim();
+				let newCmd = "";
+				for (let i = 0; i < repeat; i++) {
+					newCmd += (cleaned + ";");
+				}
+				process(newCmd);
 			}
 			else {
-				notFlairs.push(args[i]);
-			}
-		}
-		
-		try {
-			switch (args[0]) {
-				case "go":
-					if (args[1] in settings.go) {
-						gotoPage(settings.go[args[1]], flairs);
-					}
-					break;
-				case "cgo":
-					let site = window.location.host;
-					if (site in settings.cgo) {
-						if (args[1] in settings.cgo[site]) {
-							gotoPage(settings.cgo[site][args[1]], flairs);
-						}
-					}
-					break;
-				case "set":
-					if (notFlairs.length >= 4) {
-						switch (args[1]) {
-							case "go":
-								settings.go[args[2]] = args[3];
-								break;
-							case "cgo":
-								settings.cgo[window.location.host][args[2]] = args[3];
-								break;
-							case "command":
-							case "cmd":
-								settings.custom.commands[args[2]] = args[3];
-								break;
-							case "delete":
-								switch (args[2]) {
+				try {
+					switch (args[0]) {
+						case "go":
+							if (args[1] in settings.go) {
+								let goArgs = args.slice(2, notFlairs.length);
+								let parsed = parseTemplate(settings.go[args[1]], goArgs);
+								gotoPage(parsed, flairs);
+							}
+							else {
+								gotoPage(args[1], flairs);
+							}
+							break;
+						case "cgo":
+							var site = window.location.host;
+							if (site in settings.cgo) {
+								if (args[1] in settings.cgo[site]) {
+									let cgoArgs = args.slice(2, notFlairs.length);
+									let parsed = parseTemplate(settings.cgo[site][args[1]], cgoArgs);
+									gotoPage(parsed, flairs);
+								}
+								else {
+									sAlert(`${args[1]} is not a valid cgo label for this site`);
+								}
+							}
+							else {
+								sAlert("There are no cgo labels for this site");
+							}
+							break;
+						case "set":
+							if (notFlairs.length >= 4) {
+								switch (args[1]) {
 									case "go":
-										delete settings.go[args[3]];
+										if (args[3] in settings.go) {
+											settings.go[args[2]] = settings.go[args[3]];
+										}
+										else {
+											settings.go[args[2]] = args[3];
+										}
+										sAlert(`You can now use 'go ${args[2]}'`);
 										break;
 									case "cgo":
-										delete settings.cgo[window.location.host][args[3]];
+										let host = window.location.host;
+										if (!(host in settings.cgo)) {
+											settings.cgo[host] = {};
+										}
+										if (args[3] in settings.cgo[host]) {
+											settings.cgo[host][args[2]] = settings.cgo[host][args[3]];
+										}
+										else {
+											settings.cgo[host][args[2]] = args[3];
+										}
+										sAlert(`You can now use 'cgo ${args[2]}' from this site`);
 										break;
 									case "command":
 									case "cmd":
-										delete settings.custom.commands[args[3]];
+										settings.custom.commands[args[2]] = args[3];
+										sAlert(`You can now use the command '${args[2]}'`);
 										break;
+									case "delete":
+										switch (args[2]) {
+											case "go":
+												delete settings.go[args[3]];
+												sAlert(`Deleted go label '${args[3]}'`);
+												break;
+											case "cgo":
+												delete settings.cgo[window.location.host][args[3]];
+												sAlert(`Deleted cgo label '${args[3]}' from this site`);
+												break;
+											case "command":
+											case "cmd":
+												delete settings.custom.commands[args[3]];
+												sAlert(`Deleted custom command '${args[3]}'`);
+												break;
+										}
+										break;
+									default:
+										sAlert("Invalid use of 'set'. Type 'help' for assistance.");
 								}
-								break;
-						}
-						save();
+								save();
+							}
+							else {
+								sAlert("Invalid use of 'set'. Type 'help' for assistance.");
+							}
+							checkChains();
+							break;
+						case "back":
+						case "b":
+							window.history.back();
+						case "forward":
+						case "fwd":
+							window.history.forward();
+							break;
+						case "r":
+							window.location.reload();
+							break;
+						case "top":
+							window.scrollTo(0, 0);
+							checkChains();
+							break;
+						case "bottom":
+						case "bot":
+							window.scrollTo(0,document.body.scrollHeight);
+							checkChains();
+							break;
+						case "up":
+						case "u":
+							window.scroll(0, window.scrollY - (500 * (parseInt(args[1]) || 1)));
+							checkChains();
+							break;
+						case "down":
+						case "d":
+							window.scroll(0, window.scrollY + (500 * (parseInt(args[1]) || 1)));
+							checkChains();
+							break;
+						case "tab":
+							if (notFlairs.length == 2) {
+								if (parseInt(args[1])) {
+									chrome.runtime.sendMessage({type: "changeTab", option: "index", index: args[1]});
+								}
+								else {
+									chrome.runtime.sendMessage({type: "changeTab", option: args[1]});
+								}
+							}
+							else {
+								chrome.runtime.sendMessage({type: "open"});
+							}
+							break;
+						case "dup":
+							chrome.runtime.sendMessage({type: "changeTab", option: "dup"});
+							break;
+						case "window":
+						case "win":
+							chrome.runtime.sendMessage({type: "window"});
+							break;
+						case "wait":
+							setTimeout(() => {
+								checkchains();
+							}, args[1] || 0);
+							break;
+						case "reset":
+							settings.history = [];
+							chrome.runtime.sendMessage({type: "reset"});
+							sAlert(`Web CLI reset`);
+							checkChains();
+							break;
+						case "close":
+							chrome.runtime.sendMessage({type: "close"});
+							break;
+						case "macro":
+							if (args[1] in settings.custom.macros) process(settings.custom.macros[args[1]]);
+							break;
+						case "script":
+							if (args[1] in settings.custom.scripts) eval(settings.custom.scripts[args[1]]);
+							checkChains();
+							break;
+						case "help":
+							chrome.runtime.sendMessage({type: "open", url: chrome.runtime.getURL("/html/help.html"), focus: !hasFlair("-f", flairs)});
+							break;
+						case "search":
+						case "s":
+							var query = "https://www.google.com/search?q=";
+							for (let i = 1; i < notFlairs.length; i++) {
+								query += (notFlairs[i] + " ");
+							}
+							gotoPage(query, flairs);
+							break;
+						case "img":
+							var query = "https://www.google.com/search?tbm=isch&q=";
+							for (let i = 1; i < notFlairs.length; i++) {
+								query += (notFlairs[i] + " ");
+							}
+							gotoPage(query, flairs);
+							break;
+						case "wiki":
+							var query = "https://en.wikipedia.org/wiki/";
+							for (let i = 1; i < notFlairs.length; i++) {
+								query += (notFlairs[i] + " ");
+							}
+							gotoPage(query, flairs);
+							break;
+						default:
+							if (args[0] in settings.custom.commands) {
+								args[0] = settings.custom.commands[args[0]];
+								process(args.join(" "));
+							}
+							else if (args[0] in settings.custom.macros) {
+								process(settings.custom.macros[args[0]]);
+							}
+							else if (args[0] in settings.custom.scripts) {
+								eval(settings.custom.scripts[args[0]]);
+								checkChains();
+							}
+							else {
+								sAlert(`${args[0]} is not a known command!`);
+								checkChains();
+							}
 					}
-					checkCombos();
-					break;
-				case "back":
-				case "b":
-					window.history.back();
-				case "forward":
-				case "fwd":
-					window.history.forward();
-					break;
-					break;
-				case "refresh":
-				case "re":
-				case "r":
-					window.location.reload();
-					break;
-				case "top":
-					window.scrollTo(0, 0);
-					checkCombos();
-					break;
-				case "bottom":
-				case "bot":
-					window.scrollTo(0,document.body.scrollHeight);
-					checkCombos();
-					break;
-				case "up":
-				case "u":
-					window.scroll(0, window.scrollY - (500 * (parseInt(args[1]) || 1)));
-					checkCombos();
-					break;
-				case "down":
-				case "d":
-					window.scroll(0, window.scrollY + (500 * (parseInt(args[1]) || 1)));
-					checkCombos();
-					break;
-				case "wait":
-					setTimeout(() => {
-						checkCombos();
-					}, args[1] || 0);
-					break;
-				case "reset":
-					chrome.runtime.sendMessage({type: "reset"});
-					break;
-				case "close":
-					chrome.runtime.sendMessage({type: "close"});
-					break;
-				case "macro":
-					if (args[1] in settings.custom.macros) process(settings.custom.macros[args[1]]);
-					break;
-				case "script":
-					if (args[1] in settings.custom.scripts) eval(settings.custom.scripts[args[1]]);
-					checkCombos();
-					break;
-				case "help":
-					//
-					break;
-				default:
-					if (args[0] in settings.custom.commands) {
-						args[0] = settings.custom.commands[args[0]];
-						process(args.join(" "));
-					}
-					else if (args[0] in settings.custom.macros) {
-						process(settings.custom.macros[args[0]]);
-					}
-					else if (args[0] in settings.custom.scripts) {
-						eval(settings.custom.scripts[args[0]]);
-						checkCombos();
-					}
-					else {
-						sAlert(`${args[0]} is not a known command!`);
-						checkCombos();
-					}
+				}
+				catch (e) {
+					checkChains();
+					console.log(e);
+					sAlert(`Error executing '${cmd}': ${e}`);
+				}
 			}
 		}
-		catch (e) {
-			checkCombos();
-			console.log(e);
+		else {
+			chrome.runtime.sendMessage({type: "addChain", chain: chain.slice(1, chain.length).join(";")});
+			process(chain[0]);
 		}
 	}
-	else {
-		chrome.runtime.sendMessage({type: "addCombo", combo: combo.slice(1, combo.length).join(";")});
-		process(combo[0]);
-	}
 };
 
-var setCombos = function (arr) {
-	chrome.runtime.sendMessage({type: "setCombo", combo: arr.join(";")});
+var setChains = function (arr) {
+	chrome.runtime.sendMessage({type: "setChain", chain: arr.join(";")});
 };
 
-var checkCombos = function () {
-	chrome.runtime.sendMessage({type: "getCombo"}, (res, sender, sRes) => {
-		let combo = res.combo;
+var checkChains = function () {
+	chrome.runtime.sendMessage({type: "getChain"}, (res, sender, sRes) => {
+		let chain = res.chain;
 		
-		console.log("Combo:");
-		console.log(combo);
+		console.log("Chain:");
+		console.log(chain);
 		
-		if (combo) {
-			combo = combo.split(";");
-			setCombos(combo.slice(1, combo.length));
-			process(combo[0]);
+		if (chain) {
+			chain = chain.split(";");
+			setChains(chain.slice(1, chain.length));
+			process(chain[0]);
 		}
 	});
 };
@@ -208,7 +315,12 @@ var hasFlair = function (flair, flairList=[]) {
 
 var gotoPage = function (url, flairs=[]) {
 	if (hasFlair("-t", flairs)) {
-		window.open(url);
+		if (hasFlair("-f", flairs)) {
+			chrome.runtime.sendMessage({type: "open", url: url, focus: false});
+		}
+		else {
+			window.open(url);
+		}
 	}
 	else {
 		window.location = url;
@@ -216,21 +328,27 @@ var gotoPage = function (url, flairs=[]) {
 };
 
 var sAlert = function (msg) {
-	//
-	console.log(msg);
+	clearTimeout(lastAlert);
+	notif.textContent = msg;
+	$(notif).fadeIn(100);
+	lastAlert = setTimeout(function () {
+		$(notif).fadeOut(100);
+	}, 2500);
 };
 
 var run = function () {
-	document.body.appendChild(consoleContainer);
+	//document.body.appendChild(consoleContainer);
+	$("body").after(consoleContainer);
+	$("body").attr("data-wcli", "true");
 	
 	if (!settings.open) {
-		consoleContainer.style.bottom = "-50px";
+		consoleContainer.style.bottom = "-75px";
 	}
 	else {
 		input.focus();
 	}
 	
-	checkCombos();
+	checkChains();
 };
 
 var save = function (key, value) {
@@ -253,7 +371,7 @@ var changeOpen = function (bool) {
 	}
 	else {
 		$(consoleContainer).animate({
-			bottom: "-50px"
+			bottom: "-75px"
 		}, 150);
 	}
 };
@@ -278,9 +396,6 @@ var deleteKey = function (key) {
 var pageLoad = function () {
 	chrome.runtime.sendMessage({type: "getSettings"}, (res, sender, sRes) => {
 		if (res.type == "settings") {
-			//console.log("Settings:");
-			//console.log(res.settings);
-			
 			settings = res.settings;
 			run();
 		}
@@ -289,14 +404,50 @@ var pageLoad = function () {
 		}
 	});
 };
+	
+var showHistory = function () {
+	if (historyIndex > -1) {
+		input.value = settings.history[historyIndex];
+	}
+	else {
+		input.value = tempHistVal;
+	}
+};
+
+var parseTemplate = function (str, args) {
+	var list = [], index = 0, res = str;
+	for (let c = 0; c < str.length; c++) {
+		if (str[c] == "{") {
+			list[index] = {start: c, end: null};
+		}
+		else if (str[c] == "}" && list[index]) {
+			list[index].end = c;
+			index++;
+		}
+	}
+	list.forEach(o => {
+		if (o.end) {
+			let holder = str.slice(o.start, o.end + 1);
+			let num = holder.replace("{", "").replace("}", "");
+			num = (num == "*" ? "*" : parseInt(num));
+			if (args[num]) {
+				res = res.replace(holder, args[num]);
+			}
+			else if (num == "*") {
+				res = res.replace(holder, args.join(" "));
+			}
+		}
+	});
+	return res;
+};
 
 chrome.runtime.onMessage.addListener(function (res, sender, sRes) {
 	switch (res.type) {
 		case "settings":
 			settings = res.settings;
-			
-			//console.log("New settings:");
-			//console.log(settings);
+			break;
+		case "checkChains":
+			checkChains();
 			break;
 	};
 });
@@ -320,6 +471,28 @@ document.onkeydown = function (e) {
 	}
 	else if (e.key == "Enter" && settings.open && document.activeElement.id == "wcliConsole") {
 		process(input.value);
+		
+		settings.history.unshift(input.value);
+		if (settings.history.length > 50) {
+			settings.history = settings.history.slice(0, 50);
+		}
+		save("history", settings.history);
+		
 		input.value = "";
+	}
+	else if (e.key == "ArrowUp" && document.activeElement.id == "wcliConsole") {
+		if (historyIndex < settings.history.length - 1) {
+			e.preventDefault();
+			if (historyIndex == -1) tempHistVal = input.value;
+			historyIndex ++;
+			showHistory();
+		}
+	}
+	else if (e.key == "ArrowDown" && document.activeElement.id == "wcliConsole") {
+		if (historyIndex > -1) {
+			e.preventDefault();
+			historyIndex --;
+			showHistory();
+		}
 	}
 };

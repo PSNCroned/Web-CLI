@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Web CLI Help</title>
+		
+		<script src="../libs/jquery-3.1.1.min.js"></script>
+		<script src="../libs/bootstrap-3.3.7.min.js"></script>
+		
+		<link rel="stylesheet" href="../libs/bootstrap-3.3.7.min.css"></link>
+		<style>
+			.container {
+				max-width: 1000px;
+				margin: auto;
+				margin-bottom: 500px;
+			}
+			
+			h1 {
+				text-align: center;
+				margin-bottom: 50px;
+			}
+			
+			th {
+				background-color: #e8e8e8 !important;
+			}
+			
+			td {
+				cursor: pointer;
+			}
+			
+			table {
+				margin-bottom: 100px !important;
+			}
+			
+			h2 {
+				width: 100%;
+				background-color: #e8e8e8;
+				padding: 10px;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="container">
+			<h1>Web CLI Help</h1>
+			
+			<table class="table table-hover">
+				<thead>
+					<tr>
+						<th>
+							Commands
+						</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td data-anchor="back">
+							<b>back/b</b>
+						</td>
+					</tr>
+					<tr>
+						<td data-anchor="bottom">
+							<b>bottom/bot</b>
+						</td>
+					</tr>
+					<tr>
+						<td data-anchor="cgo">
+							<b>cgo</b> [label]
+						</td>
+					</tr>
+					<tr>
+						<td data-anchor="close">
+							<b>close</b>
+						</td>
+					</tr>
+					<tr>
+						<td data-anchor="down">
+							<b>down/d</b><br />
+							<b>down/d</b> [amount]<br />
+						</td>
+					</tr>
+					<tr>
+						<td data-anchor="dup">
+							<b>dup</b>
+						</td>
+					</tr>
+					<tr>
+						<td data-anchor="forward">
+							<b>forward/f</b>
+						</td>
+					</tr>
+					<tr>
+						<td data-anchor="go">
+							<b>go</b> [url, label]
+						</td>
+					</tr>
+					<tr>
+						<td data-anchor="help">
+							<b>help</b>
+						</td>
+					</tr>
+					<tr>
+						<td data-anchor="img">
+							<b>img</b> [query]
+						</td>
+					</tr>
+					<tr>
+						<td data-anchor="refresh">
+							<b>r</b>
+						</td>
+					</tr>
+					<tr>
+						<td data-anchor="reset">
+							<b>reset</b>
+						</td>
+					</tr>
+					<tr>
+						<td data-anchor="search">
+							<b>search/s</b> [query]
+						</td>
+					</tr>
+					<tr>
+						<td data-anchor="set">
+							<b>set</b> cgo/go [label] [url or existing label]<br />
+							<b>set</b> cmd [label] [existing label]<br />
+							<b>set</b> delete go/cgo/cmd [label]<br />
+					</tr>
+					<tr>
+						<td data-anchor="tab">
+							<b>tab</b><br />
+							<b>tab</b> [index]<br />
+							<b>tab</b> n/p/f/l<br />
+						</td>
+					</tr>
+					<tr>
+						<td data-anchor="top">
+							<b>top</b>
+						</td>
+					</tr>
+					<tr>
+						<td data-anchor="up">
+							<b>up/u</b><br />
+							<b>down/d</b> [amount]<br />
+						</td>
+					</tr>
+					<tr>
+						<td data-anchor="wait">
+							<b>wait</b> [time]
+						</td>
+					</tr>
+					<tr>
+						<td data-anchor="wiki">
+							<b>wiki</b> [article name]
+						</td>
+					</tr>
+					<tr>
+						<td data-anchor="window">
+							<b>window/win</b>
+						</td>
+					</tr>
+				</tbody>
+				<thead>
+					<tr>
+						<th>
+							Flairs
+						</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td data-anchor="-t">
+							<b>-t</b>: new tab
+						</td>
+					</tr>
+					<tr>
+						<td data-anchor="-t">
+							<b>-f</b>: don't focus
+						</td>
+					</tr>
+				</tbody>
+				<thead>
+					<tr>
+						<th>
+							Programmatic Functionality
+						</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td data-anchor="repeat">
+							<b>repeat</b>
+						</td>
+					</tr>
+					<tr>
+						<td data-anchor="macros">
+							<b>macros</b>
+						</td>
+					</tr>
+					<tr>
+						<td data-anchor="scripts">
+							<b>scripts</b>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			
+			<div class="section" id="cmd_back">
+				<h2>
+					back
+				</h2>
+				<p>
+					Moves backward in history
+				</p>
+				<kbd>
+					> back
+				</kbd>
+			</div>
+			
+			<div class="section" id="cmd_bottom">
+				<h2>
+					bottom/bot
+				</h2>
+				<p>
+					Scrolls to the bottom of the page
+				</p>
+				<kbd>
+					> bot
+				</kbd>
+			</div>
+			
+			<div class="section" id="cmd_cgo">
+				<h2>
+					cgo
+				</h2>
+				<p>
+					A contextual go command that navigates to a predefined label based on the current site
+				</p>
+				<kbd>
+					> go youtube
+				</kbd>
+				<br />
+				<kbd>
+					> cgo subs
+				</kbd>
+				<br />
+				Additional arguments can sometimes be passed, such as when navigating to a specific user page:
+				<br />
+				<kbd>
+					> go twitter
+				</kbd>
+				<br />
+				<kbd>
+					> cgo user google
+				</kbd>
+			</div>
+			
+			<div class="section" id="cmd_close">
+				<h2>
+					close
+				</h2>
+				<p>
+					Closes the current tab
+				</p>
+				<kbd>
+					> close
+				</kbd>
+			</div>
+			
+			<div class="section" id="cmd_down">
+				<h2>
+					down/d
+				</h2>
+				<p>
+					Scrolls down, can specify a factor by how much to scroll
+				</p>
+				<kbd>
+					> down
+				</kbd>
+				<br />
+				or
+				<br />
+				<kbd>
+					> d 2
+				</kbd>
+			</div>
+			
+			<div class="section" id="cmd_dup">
+				<h2>
+					dup
+				</h2>
+				<p>
+					Duplicates the current tab
+				</p>
+				<kbd>
+					> dup
+				</kbd>
+			</div>
+			
+			<div class="section" id="cmd_forward">
+				<h2>
+					forward/f
+				</h2>
+				<p>
+					Moves forward in history
+				</p>
+				<kbd>
+					> f
+				</kbd>
+			</div>
+			
+			<div class="section" id="cmd_go">
+				<h2>
+					go
+				</h2>
+				<p>
+					Navigates to a particular url or label
+				</p>
+				<kbd>
+					> go https://google.com
+				</kbd>
+				<br />
+				or
+				<br />
+				<kbd>
+					> go google
+				</kbd>
+				<br />
+				Additional arguments can sometimes be passed, such as when navigating to a specific page within a website:
+				<br />
+				<kbd>
+					> go wikiarticle google
+				</kbd>
+			</div>
+			
+			<div class="section" id="cmd_help">
+				<h2>
+					help
+				</h2>
+				<p>
+					Opens this help page in a new tab
+				</p>
+				<kbd>
+					> help
+				</kbd>
+			</div>
+			
+			<div class="section" id="cmd_img">
+				<h2>
+					img
+				</h2>
+				<p>
+					Searches the given query on Google Images
+				</p>
+				<kbd>
+					> img banana
+				</kbd>
+			</div>
+			
+			<div class="section" id="cmd_refresh">
+				<h2>
+					r
+				</h2>
+				<p>
+					Refreshes the current tab
+				</p>
+				<kbd>
+					> r
+				</kbd>
+			</div>
+			
+			<div class="section" id="cmd_reset">
+				<h2>
+					reset
+				</h2>
+				<p>
+					Resets Web CLI, clearing all settings and saved macros/scripts
+				</p>
+				<kbd>
+					> reset
+				</kbd>
+			</div>
+			
+			<div class="section" id="cmd_search">
+				<h2>
+					search/s
+				</h2>
+				<p>
+					Searches the given query on Google
+				</p>
+				<kbd>
+					> s banana
+				</kbd>
+			</div>
+			
+			<div class="section" id="cmd_set">
+				<h2>
+					set
+				</h2>
+				<p>
+					Set command substitutions and custom lables for <b>go</b> and <b>cgo</b>. 
+				</p>
+				<kbd>
+					> set cmd helpme help
+				</kbd>
+				<br />
+				Typing <b>helpme</b> would then have the same effect as <b>help</b>.
+				<br />
+				<kbd>
+					> set go mysite https://mysite.com
+				</kbd>
+				<br />
+				Typing <b>go mysite</b> would then navigate you to https://mysite.com
+				<br />
+				<kbd>
+					> set go goog google
+				</kbd>
+				<br />
+				Typing <b>go goog</b> would then be equivalent to <b>go google</b>.
+				<br />
+				<kbd>
+					> set cgo home /home
+				</kbd>
+				<br />
+				Typing <b>cgo home</b> while on the same site would take you to /home.
+				<br />
+				<kbd>
+					> set cgo s subs
+				</kbd>
+				<br />
+				Typing <b>cgo s</b> while on the same site would be equivalent to <b>cgo subs</b>.
+				<br />
+				<kbd>
+					> set cgo user /user/{0}
+				</kbd>
+				<br />
+				Typing <b>cgo user john</b> while on the same site would take you to /user/john.
+				<br />
+				<kbd>
+					> set cgo search /search?q={*}
+				</kbd>
+				<br />
+				Typing <b>cgo search sample search words</b> while on the same site would search for 'sample search words' on that site
+			</div>
+			
+			<div class="section" id="cmd_tab">
+				<h2>
+					tab
+				</h2>
+				<p>
+					Allows for switching between tabs
+				</p>
+				<kbd>
+					> tab
+				</kbd>
+				<br />
+				Makes a new tab
+				<br />
+				<kbd>
+					> tab f
+				</kbd>
+				<br />
+				Goes to the first tab
+				<br />
+				<kbd>
+					> tab l
+				</kbd>
+				<br />
+				Goes to the last tab
+				<br />
+				<kbd>
+					> tab n
+				</kbd>
+				<br />
+				Goes to the next tab
+				<br />
+				<kbd>
+					> tab p
+				</kbd>
+				<br />
+				Goes to the previous tab
+				<br />
+				<kbd>
+					> tab 2
+				</kbd>
+				<br />
+				Goes to the second tab
+				<br />
+			</div>
+			
+			<div class="section" id="cmd_top">
+				<h2>
+					top
+				</h2>
+				<p>
+					Scrolls to the top of the page
+				</p>
+				<kbd>
+					> top
+				</kbd>
+			</div>
+			
+			<div class="section" id="cmd_up">
+				<h2>
+					up/u
+				</h2>
+				<p>
+					Scrolls up, can specify a factor by how much to scroll
+				</p>
+				<kbd>
+					> u
+				</kbd>
+				<br />
+				or
+				<br />
+				<kbd>
+					> up 3
+				</kbd>
+			</div>
+			
+			<div class="section" id="cmd_wait">
+				<h2>
+					wait
+				</h2>
+				<p>
+					Waits the specified amount of miliseconds. Useful for command chains and macros.
+				</p>
+				<kbd>
+					> wait 500
+				</kbd>
+				<br />
+				Waits 500 miliseconds (half a second)
+			</div>
+			
+			<div class="section" id="cmd_wiki">
+				<h2>
+					wiki
+				</h2>
+				<p>
+					Go directly to a wikipedia article
+				</p>
+				<kbd>
+					> wiki banana
+				</kbd>
+			</div>
+			
+			<div class="section" id="cmd_window">
+				<h2>
+					window/win
+				</h2>
+				<p>
+					Creates a new window
+				</p>
+				<kbd>
+					> win
+				</kbd>
+			</div>
+			
+			<div class="section" id="cmd_-t">
+				<h2>
+					-t
+				</h2>
+				<p>
+					If the command involves navigation, performs the navigation in a new tab.
+				</p>
+				<kbd>
+					> go google -t
+				</kbd>
+			</div>
+			
+			<div class="section" id="cmd_-f">
+				<h2>
+					-f
+				</h2>
+				<p>
+					If the command makes a new tab, does not focus on the tab.
+				</p>
+				<kbd>
+					> go google -t -f
+				</kbd>
+			</div>
+			
+			<div class="section" id="cmd_repeat">
+				<h2>
+					*n
+				</h2>
+				<p>
+					Repeats the preceding command <b>n</b> number of times.
+				</p>
+				<kbd>
+					> go google -t *2
+				</kbd>
+				<br />
+				Opens two new tabs and navigates them to https://google.com
+				<br />
+				<kbd>
+					> close *3
+				</kbd>
+				<br />
+				Closes three tabs in succession
+			</div>
+			
+			<div class="section" id="cmd_macros">
+				<h2>
+					Command chains and macros
+				</h2>
+				<p>
+					You can perform multiple commands in succession by separating them with a semicolon. If a command involves creating or changing focus to a tab, the next command will occur in the newly created or focused tab.
+				</p>
+				<kbd>
+					> go youtube -t; cgo subs
+				</kbd>
+				<br />
+				or
+				<br />
+				<kbd>
+					> tab 3; go google
+				</kbd>
+				<br />
+				<br />
+				<p>
+					Instead of needing to type these command chains out each time, you can save them as a macro using the extension icon in the top right. The name of the macro then becomes a useable command. For instance, if you saved <b>go youtube -t; cgo subs</b> under the name <b>ytsubs</b> you could use
+				</p>
+				<kbd>
+					> ytsubs
+				</kbd>
+			</div>
+			
+			<div class="section" id="cmd_scripts">
+				<h2>
+					Scripts
+				</h2>
+				<p>
+					You can even write your own JavaScript for your own custom commands. After clicking the extension icon in the top right, you can save JavaScript code under any command name and have that code run every time you enter that command.
+				</p>
+				<p>
+					Your script runs in the context of the extension's content script itself, meaning you have access to variables like <code>args</code> which is an array that contains the arguments entered with the command. 
+				</p>
+				<p>
+					You also have access to the <code>store()</code>, <code>retrieve()</code>, and <code>deleteKey()</code> functions, which allow you save and retrieve data in the extension's background page like so:
+				</p>
+				<pre>
+	//Data is saved in a JavaScript object
+
+	store("test", 5); //Stores 5 under the key 'test'
+
+	retrieve("test", function (data) { //Retrieves the value stored under key 'test'
+		//callback
+	});
+
+	retrieve("test", function () { //Retrieves the entire storage object
+		//callback
+	});
+
+	deleteKey("test"); //Delete the key 'test' from the storage object
+				</pre>
+			</div>
+		</div>
+		
+		<script src="../help.js"></script>
+	</body>
+</html>

@@ -91,5 +91,13 @@ chrome.runtime.sendMessage({type: "getSettings"}, (res, sender, sRes) => {
 		$(this).addClass("sel");
 		$(".panel").hide();
 		$("#" + $(this).data("panel") + "Panel").show();
+		
+		if ($(this).data("panel") == "set") {
+			$("#setPanel pre").text(JSON.stringify(settings, null, 4));
+		}
+	});
+	
+	$("#help").click(function () {
+		chrome.runtime.sendMessage({type: "open", url: chrome.runtime.getURL("/html/help.html"), focus: true});
 	});
 });
